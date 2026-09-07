@@ -1,0 +1,41 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Backend local files
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite
+*.sqlite3
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnp
+.pnp.js
+
+# Frontend build output
+dist/
+dist-ssr/
+out-tsc/
+
+# Logs
+logs/
+*.log
+
+# Editors and OS files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Claude Code local machine settings
+.claude/settings.local.json
