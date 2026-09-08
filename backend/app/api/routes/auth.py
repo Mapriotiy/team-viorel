@@ -116,7 +116,12 @@ async def google_code(request: Request, response: Response, payload: GoogleCodeR
             detail="Could not exchange Google token",
         ) from exc
 
-    sub = claims["sub"]
+    sub = claims.get("sub")
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Google token missing subject",
+        )
 
     email = claims.get("email") if claims.get("email_verified") else None
     display_name = claims.get("name")
