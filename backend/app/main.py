@@ -30,7 +30,7 @@ app.add_middleware(
 @app.middleware("http")
 async def csrf_protection(request: Request, call_next):
     if request.method in {"POST", "PUT", "PATCH", "DELETE"} and request.url.path.startswith("/api/"):
-        if not request.headers.get("authorization"):
+        if request.url.path != "/api/auth/google/code" and not request.headers.get("authorization"):
             cookie = request.cookies.get("csrf_token")
             header = request.headers.get("x-csrf-token")
             if not cookie or not header or cookie != header:
