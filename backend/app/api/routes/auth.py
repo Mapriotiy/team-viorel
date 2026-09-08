@@ -76,6 +76,24 @@ async def google_code(request: Request, response: Response, payload: GoogleCodeR
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired Google login session",
         )
+    if session.used_at is not None:
+        logger.warning(
+            "Google login session %s already used at %s",
+            payload.state[:8],
+            session.used_at,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired Google login session",
+        )
+    if session.expires_at < _utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Google login session expired",
+        )
+
+    session.used_at = _utcnow()
+    db.commit()
 
     try:
         claims = await verify_google_code(
