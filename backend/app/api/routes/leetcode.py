@@ -14,6 +14,7 @@ from app.services.leetcode_client import LeetCodeClient
 from app.services.leetcode_verification import (
     MAX_ATTEMPTS,
     active_verification_for,
+    cooldown_until,
     latest_verification_for,
     start_verification,
     unlink_verification,
@@ -37,6 +38,7 @@ def _verification_response(verification) -> LeetCodeVerificationResponse:
         verified_submission_id=verification.verified_submission_id,
         verified_submission_at=verification.verified_submission_at,
         failure_reason=verification.failure_reason,
+        cooldown_until=cooldown_until(verification),
     )
 
 

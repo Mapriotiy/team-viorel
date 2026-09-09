@@ -23,6 +23,7 @@ from app.services.leetcode_client import LeetCodeClient
 logger = logging.getLogger(__name__)
 
 VERIFICATION_WINDOW_MINUTES = settings.leetcode_verify_window_minutes
+VERIFY_COOLDOWN_SECONDS = settings.leetcode_verify_cooldown_seconds
 MAX_ATTEMPTS = settings.leetcode_verify_max_attempts
 PROBLEM_SLUG = settings.leetcode_verify_problem_slug
 
@@ -42,6 +43,13 @@ def _utc_epoch(value: datetime) -> float:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc).timestamp()
     return value.timestamp()
+
+
+def cooldown_until(verification: LeetCodeAccountVerification) -> datetime | None:
+    if verification.last_attempt_at is None:
+        return None
+    end = verification.last_attempt_at + timedelta(seconds=VERIFY_COOLDOWN_SECONDS)
+    return end if end > _utcnow() else None
 
 
 def latest_verification_for(user_id: int, db: Session) -> LeetCodeAccountVerification | None:
@@ -144,6 +152,14 @@ async def verify_verification(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Maximum verification attempts reached. Start a new verification.",
+        )
+
+    cd_until = cooldown_until(verification)
+    if cd_until is not None:
+        retry_after = max(1, int((cd_until - now).total_seconds()))
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Please wait {retry_after}s before verifying again",
         )
 
     client = LeetCodeClient()

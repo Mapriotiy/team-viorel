@@ -181,6 +181,25 @@ def test_verify_rejects_old_submission_before_window(db, tmp_path, monkeypatch):
     assert verification.attempts == 1
 
 
+def test_verify_cooldown(db, tmp_path, monkeypatch):
+    in_window = _utc_epoch(_now()) + 60
+    submissions = [{
+        "id": 1, "title": "Two Sum", "titleSlug": "two-sum",
+        "timestamp": str(in_window), "lang": "python3", "runtime": "10 ms",
+    }]
+    monkeypatch.setattr("app.core.config.settings.leetcode_fake_submissions_path", make_fake_submissions_file(tmp_path, submissions))
+
+    user = make_user(db)
+    verification = start_verification(user, "alice", db)
+    verification.last_attempt_at = _now()
+    db.commit()
+
+    with pytest.raises(HTTPException) as exc:
+        run_verify(user, verification, db)
+    assert exc.value.status_code == 429
+    assert verification.attempts == 0
+
+
 def test_verify_expired_window(db, tmp_path, monkeypatch):
     monkeypatch.setattr("app.core.config.settings.leetcode_fake_submissions_path", make_fake_submissions_file(tmp_path, []))
     user = make_user(db)
