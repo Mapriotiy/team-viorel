@@ -1,13 +1,23 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from app.api.router import api_router
+from app.services.leetcode_client import close_client
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await close_client()
 
 
 app = FastAPI(
     title="LeetCode Streaks API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -30,6 +40,9 @@ app.add_middleware(
 @app.middleware("http")
 async def csrf_protection(request: Request, call_next):
     if request.method in {"POST", "PUT", "PATCH", "DELETE"} and request.url.path.startswith("/api/"):
+        # OAuth code exchange is the unauthenticated endpoint that creates the
+        # cookies; all subsequent cookie-authenticated mutations need the
+        # double-submit token.
         if request.url.path != "/api/auth/google/code" and not request.headers.get("authorization"):
             cookie = request.cookies.get("csrf_token")
             header = request.headers.get("x-csrf-token")
