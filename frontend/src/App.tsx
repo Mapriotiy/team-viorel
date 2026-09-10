@@ -29,6 +29,7 @@ export default function App() {
 function MainApp() {
     const [user, setUser] = useState<User | null>(null);
     const [isLoadingSession, setIsLoadingSession] = useState(true);
+    const [sessionStalled, setSessionStalled] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
     const [showLeetCodeLink, setShowLeetCodeLink] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -82,6 +83,13 @@ function MainApp() {
         void bootstrap().finally(() => setIsLoadingSession(false));
     }, []);
 
+    // Only surface the loader if session bootstrap is genuinely slow; fast
+    // loads should paint straight into the auth page without a flash.
+    useEffect(() => {
+        const stallTimer = window.setTimeout(() => setSessionStalled(true), 200);
+        return () => window.clearTimeout(stallTimer);
+    }, []);
+
     useEffect(() => {
         function pingBackend() {
             apiRequest<{ status: string }>("/health").catch(() => {});
@@ -97,7 +105,11 @@ function MainApp() {
     }, []);
 
     if (isLoadingSession) {
-        return null;
+        return sessionStalled ? (
+            <main className="min-h-screen bg-[#0f0d0b] p-6 text-white">
+                Loading...
+            </main>
+        ) : null;
     }
 
     let screen: ReactNode;
