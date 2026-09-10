@@ -113,10 +113,8 @@ function MainApp() {
     }
 
     let screen: ReactNode;
-    let screenKey: string;
 
     if (!user) {
-        screenKey = "auth";
         screen = (
             <AuthPage
                 initialError={authError}
@@ -124,7 +122,6 @@ function MainApp() {
             />
         );
     } else {
-        screenKey = "dashboard";
         screen = (
             <main className="min-h-screen bg-[#0f0d0b] px-6 py-10 text-[#eff1f6]">
                 <div className="mx-auto max-w-3xl">

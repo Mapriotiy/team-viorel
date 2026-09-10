@@ -4,6 +4,11 @@ export async function apiRequest<T>(
     path: string,
     options: RequestInit = {},
 ): Promise<T> {
+    const csrf = document.cookie
+        .split(";")
+        .map((part) => part.trim())
+        .find((part) => part.startsWith("csrf_token="))
+        ?.slice("csrf_token=".length);
     const method = (options.method ?? "GET").toUpperCase();
 
     const response = await fetch(`${API_URL}${path}`, {
@@ -11,6 +16,7 @@ export async function apiRequest<T>(
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            ...(csrf && method !== "GET" && method !== "HEAD" ? { "X-CSRF-Token": csrf } : {}),
             ...options.headers,
         },
     });
