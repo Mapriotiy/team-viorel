@@ -217,7 +217,9 @@ function MainApp() {
                                         value={streak?.current ?? 0}
                                         className="font-serif text-5xl font-black text-[#f4e7d8]"
                                     />
-                                    <span className="text-sm text-[#8f8278]">days</span>
+                                    <span className="text-sm text-[#8f8278]">
+                                        {streak?.current === 1 ? "day" : "days"}
+                                    </span>
                                 </p>
                             </div>
                             <div className="rounded-xl border border-[#2e2a26] bg-[#151210] p-6">
@@ -230,7 +232,9 @@ function MainApp() {
                                         value={streak?.longest ?? 0}
                                         className="font-serif text-5xl font-black text-[#f4e7d8]"
                                     />
-                                    <span className="text-sm text-[#8f8278]">days</span>
+                                    <span className="text-sm text-[#8f8278]">
+                                        {streak?.longest === 1 ? "day" : "days"}
+                                    </span>
                                 </p>
                             </div>
                             <div className="rounded-xl border border-[#2e2a26] bg-[#151210] p-6">
