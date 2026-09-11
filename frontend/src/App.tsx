@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { Link2, LogOut, MapPin } from "lucide-react";
+import { Flame, Link2, LogOut, MapPin, Trophy } from "lucide-react";
 import { apiRequest } from "./api/client";
+import { AnimatedNumber } from "./components/AnimatedNumber";
 import { LeetCodeLinkModal } from "./components/LeetCodeLinkModal";
 import { OnboardingOverlay, isOnboarded, markOnboarded } from "./components/OnboardingOverlay";
 import { AuthPage } from "./pages/AuthPage";
+import { computeStreak, type LeetCodeProfile, type StreakInfo } from "./types/dashboard";
 
 type User = {
     id: number;
@@ -33,6 +35,8 @@ function MainApp() {
     const [authError, setAuthError] = useState<string | null>(null);
     const [showLeetCodeLink, setShowLeetCodeLink] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [profile, setProfile] = useState<LeetCodeProfile | null>(null);
+    const [streak, setStreak] = useState<StreakInfo | null>(null);
 
     function clearUrlParam(param: string) {
         const url = new URL(window.location.href);
@@ -98,6 +102,28 @@ function MainApp() {
         const intervalId = window.setInterval(pingBackend, KEEP_ALIVE_INTERVAL_MS);
         return () => window.clearInterval(intervalId);
     }, []);
+
+    useEffect(() => {
+        if (!user?.leetcode_verified_at || !user.leetcode_username) return;
+        let cancelled = false;
+
+        apiRequest<LeetCodeProfile>(
+            `/leetcode/profile/${encodeURIComponent(user.leetcode_username)}`,
+        )
+            .then((data) => {
+                if (cancelled) return;
+                setProfile(data);
+                setStreak(computeStreak(data.submission_calendar));
+            })
+            .catch(() => {
+                if (cancelled) return;
+                setStreak({ current: 0, longest: 0 });
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [user?.leetcode_verified_at, user?.leetcode_username]);
 
     const handleLogout = useCallback(() => {
         void apiRequest("/auth/logout", { method: "POST" });
@@ -178,6 +204,50 @@ function MainApp() {
                             ) : null}
                         </div>
                     </div>
+
+                    {user.leetcode_verified_at ? (
+                        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                            <div className="rounded-xl border border-[#2e2a26] bg-[#151210] p-6">
+                                <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#8f8278]">
+                                    <Flame size={14} className="text-[#e6a15d]" />
+                                    Current streak
+                                </p>
+                                <p className="mt-3 flex items-baseline gap-2">
+                                    <AnimatedNumber
+                                        value={streak?.current ?? 0}
+                                        className="font-serif text-5xl font-black text-[#f4e7d8]"
+                                    />
+                                    <span className="text-sm text-[#8f8278]">days</span>
+                                </p>
+                            </div>
+                            <div className="rounded-xl border border-[#2e2a26] bg-[#151210] p-6">
+                                <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#8f8278]">
+                                    <Trophy size={14} className="text-[#e6a15d]" />
+                                    Longest streak
+                                </p>
+                                <p className="mt-3 flex items-baseline gap-2">
+                                    <AnimatedNumber
+                                        value={streak?.longest ?? 0}
+                                        className="font-serif text-5xl font-black text-[#f4e7d8]"
+                                    />
+                                    <span className="text-sm text-[#8f8278]">days</span>
+                                </p>
+                            </div>
+                            <div className="rounded-xl border border-[#2e2a26] bg-[#151210] p-6">
+                                <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#8f8278]">
+                                    <MapPin size={14} className="text-[#e6a15d]" />
+                                    Problems solved
+                                </p>
+                                <p className="mt-3 flex items-baseline gap-2">
+                                    <AnimatedNumber
+                                        value={profile?.solved.total ?? 0}
+                                        className="font-serif text-5xl font-black text-[#f4e7d8]"
+                                    />
+                                    <span className="text-sm text-[#8f8278]">total</span>
+                                </p>
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
 
                 {showLeetCodeLink ? (
