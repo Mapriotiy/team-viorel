@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: leetcode-streaks-api
+    name: vio-code-api
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt
@@ -10,3 +10,14 @@ services:
         value: 3.12.0
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: 1440
+      - key: ENVIRONMENT
+        value: production
+      - key: FRONTEND_URL
+        value: https://mapriotiy.github.io/team-viorel
+      # Set these in the Render dashboard (Settings -> Environment):
+      - key: SECRET_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

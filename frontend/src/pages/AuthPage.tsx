@@ -46,7 +46,7 @@ export function AuthPage({ initialError = null, onClearError }: AuthPageProps) {
             <header className="sticky top-0 z-40 border-b border-[#2e2a26] bg-[#12100d]/90 backdrop-blur">
                 <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3.5">
                     <span className="text-lg font-black tracking-tight text-[#e6a15d]">
-                        Streak<span className="text-[#eff1f6]">Map</span>
+                        Vio<span className="text-[#eff1f6]">Code</span>
                     </span>
                     <GoogleButton
                         onLogin={onLogin}

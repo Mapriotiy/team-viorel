@@ -97,7 +97,7 @@ query problemsetQuestionList($categorySlug: String, $skip: Int, $limit: Int, $fi
 _HEADERS = {
     "Content-Type": "application/json",
     "Referer": "https://leetcode.com",
-    "User-Agent": "leetcode-streaks-dev",
+    "User-Agent": "vio-code-dev",
 }
 
 _client: httpx.AsyncClient | None = None

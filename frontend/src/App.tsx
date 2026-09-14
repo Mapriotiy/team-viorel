@@ -181,7 +181,7 @@ function MainApp() {
 
                     <div className="rounded-xl border border-[#2e2a26] bg-[#151210] p-8">
                         <h1 className="text-2xl font-black tracking-tight">
-                            Welcome to <span className="text-[#e6a15d]">StreakMap</span>
+                            Welcome to <span className="text-[#e6a15d]">Vio Code</span>
                         </h1>
                         <p className="mt-2 max-w-md text-sm leading-relaxed text-[#9d8f80]">
                             Link your LeetCode account to start tracking your streak and capturing

@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: https://leetcode-streaks-dyg6.onrender.com/api
+          VITE_API_URL: https://vio-code-api.onrender.com/api
 
       - name: Add SPA fallback for GitHub Pages
         run: cp dist/index.html dist/404.html

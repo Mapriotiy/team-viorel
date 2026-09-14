@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="LeetCode Streaks API",
+    title="Vio Code API",
     version="0.1.0",
     lifespan=lifespan,
 )
