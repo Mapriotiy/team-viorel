@@ -25,6 +25,8 @@ from app.models.user import User
 from app.models.oauth_session import OAuthSession
 from app.models.leetcode_problem import LeetCodeProblem
 from app.models.leetcode_account_verification import LeetCodeAccountVerification
+from app.models.daily_activity import DailyActivity
+from app.models.user_activity import UserActivity
 
 target_metadata = Base.metadata
 
