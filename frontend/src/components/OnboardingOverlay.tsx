@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Flame, Link2, Map, Trophy } from "lucide-react";
 
-const ONBOARDED_KEY = "mapcode.onboarded";
+const ONBOARDED_KEY = "viocode.onboarded";
 
 export function isOnboarded(): boolean {
     try {
@@ -23,7 +23,7 @@ const STEPS = [
     {
         icon: Map,
         title: "Solve. Capture. Conquer.",
-        body: "Cinnamon Code turns your LeetCode grind into a live map battle. Every solved problem plants your flag on a province.",
+        body: "Vio Code turns your LeetCode grind into a live map battle. Every solved problem plants your flag on a province.",
     },
     {
         icon: Link2,
