@@ -8,6 +8,7 @@ import { AnimatedNumber } from "../components/AnimatedNumber";
 import { Footer } from "../components/Footer";
 import { Logo } from "../components/Logo";
 import { OnboardingOverlay, isOnboarded } from "../components/OnboardingOverlay";
+import { ProfilePage } from "./ProfilePage";
 import type { DashboardData } from "../types/dashboard";
 
 type User = {
@@ -81,6 +82,7 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
     const [showLinkModal, setShowLinkModal] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(() => !isOnboarded());
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -205,6 +207,17 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
                                         type="button"
                                         onClick={() => {
                                             setProfileMenuOpen(false);
+                                            setShowProfile(true);
+                                        }}
+                                        className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-[#d9c5ad] transition hover:bg-[#2a1f19]"
+                                    >
+                                        <UserCircle size={15} />
+                                        View profile
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setProfileMenuOpen(false);
                                             onLogout();
                                         }}
                                         className="flex w-full items-center gap-2.5 px-3 py-2.5 text-sm text-red-300 transition hover:bg-[#2a1f19]"
@@ -220,6 +233,10 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
             </header>
 
             <div className="mx-auto max-w-5xl">
+                {showProfile && dashboardData ? (
+                    <ProfilePage user={user} data={dashboardData} onBack={() => setShowProfile(false)} />
+                ) : null}
+                <div className={showProfile ? "hidden" : ""}>
                 {!isLeetcodeLinked ? (
                     <section className="mt-6 rounded-lg border border-[#3f332d] bg-[#211a16] p-6 shadow-xl shadow-black/20">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -361,6 +378,7 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
                     <OnboardingOverlay onClose={() => setShowOnboarding(false)} />
                 )}
 
+                </div>
                 <Footer />
             </div>
         </main>
