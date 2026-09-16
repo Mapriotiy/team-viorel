@@ -9,6 +9,7 @@ from app.models.oauth_session import OAuthSession  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.models.daily_activity import DailyActivity  # noqa: F401
 from app.models.user_activity import UserActivity  # noqa: F401
+from app.models.lobby import Lobby, LobbyPlayer  # noqa: F401
 
 
 @pytest.fixture

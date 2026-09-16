@@ -27,6 +27,7 @@ from app.models.leetcode_problem import LeetCodeProblem
 from app.models.leetcode_account_verification import LeetCodeAccountVerification
 from app.models.daily_activity import DailyActivity
 from app.models.user_activity import UserActivity
+from app.models.lobby import Lobby, LobbyPlayer
 
 target_metadata = Base.metadata
 
