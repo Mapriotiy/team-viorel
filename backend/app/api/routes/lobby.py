@@ -61,3 +61,8 @@ def get_lobby(lobby_id: int, db: Session = Depends(get_db)):
     if lobby is None:
         raise HTTPException(status_code=404, detail="Lobby not found")
     return _as_response(lobby, db)
+
+
+@router.get("", response_model=list[LobbyResponse])
+def list_lobbies(db: Session = Depends(get_db)):
+    return [_as_response(lobby, db) for lobby in db.query(Lobby).filter(Lobby.status == "open").order_by(Lobby.created_at.desc()).all()]
