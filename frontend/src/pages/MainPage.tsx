@@ -838,7 +838,7 @@ export function MainPage() {
     let content: ReactNode;
 
     if (screen === "profile") {
-        content = <ProfilePage onBack={goDashboard} onLogout={handleLogout} />;
+        content = <ProfilePage avatarUrl={user.avatar_url} onBack={goDashboard} onLogout={handleLogout} />;
     } else if (screen === "admin") {
         content = <Sprint3PlaceholderPage title="Admin tools" onBack={goDashboard} />;
     } else if (screen === "friends") {

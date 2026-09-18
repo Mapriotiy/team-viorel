@@ -19,6 +19,7 @@ import type { DashboardData } from "../types/dashboard";
 type ProfilePageProps = {
     onBack: () => void;
     onLogout: () => void;
+    avatarUrl?: string | null;
 };
 
 function StreakPill({ count, lit }: { count: number; lit: boolean }) {
@@ -69,7 +70,7 @@ function StatTile({
     );
 }
 
-export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
+export function ProfilePage({ onBack, onLogout, avatarUrl }: ProfilePageProps) {
     const [data, setData] = useState<DashboardData | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -130,8 +131,8 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
                     />
                     <div className="relative flex flex-col items-center gap-4 sm:flex-row">
                         <span className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-[#e6a15d]/40 bg-[#24201c] text-[#a8917d] shadow-lg">
-                            {data?.avatar_url ? (
-                                <img src={data.avatar_url} alt="" className="h-full w-full object-cover" />
+                            {(data?.avatar_url ?? avatarUrl) ? (
+                                <img src={data?.avatar_url ?? avatarUrl ?? ""} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                             ) : (
                                 <UserCircle size={48} strokeWidth={1.6} />
                             )}
