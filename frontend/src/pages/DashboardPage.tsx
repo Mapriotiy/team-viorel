@@ -11,6 +11,7 @@ import { OnboardingOverlay, isOnboarded } from "../components/OnboardingOverlay"
 import { ProfilePage } from "./ProfilePage";
 import { LobbyPage } from "./LobbyPage";
 import { MapPresetsPage } from "./MapPresetsPage";
+import { FriendsPage } from "./FriendsPage";
 import type { DashboardData } from "../types/dashboard";
 
 type User = {
@@ -87,6 +88,7 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
     const [showProfile, setShowProfile] = useState(false);
     const [showLobby, setShowLobby] = useState(false);
     const [showMaps, setShowMaps] = useState(false);
+    const [showFriends, setShowFriends] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -172,7 +174,7 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
                         ) : null}
 
                         <div className="relative" ref={profileMenuRef}>
-                            <div className="flex gap-2"><button type="button" onClick={() => setShowLobby(true)} className="rounded-md border border-[#3a342e] px-3 py-2 text-sm text-[#d9c5ad] hover:bg-[#2a1f19]">Lobbies</button><button type="button" onClick={() => setShowMaps(true)} className="rounded-md border border-[#3a342e] px-3 py-2 text-sm text-[#d9c5ad] hover:bg-[#2a1f19]">Maps</button></div>
+                            <div className="flex gap-2"><button type="button" onClick={() => setShowFriends(true)} className="rounded-md border border-[#3a342e] px-3 py-2 text-sm text-[#d9c5ad] hover:bg-[#2a1f19]">Friends</button><button type="button" onClick={() => setShowLobby(true)} className="rounded-md border border-[#3a342e] px-3 py-2 text-sm text-[#d9c5ad] hover:bg-[#2a1f19]">Lobbies</button><button type="button" onClick={() => setShowMaps(true)} className="rounded-md border border-[#3a342e] px-3 py-2 text-sm text-[#d9c5ad] hover:bg-[#2a1f19]">Maps</button></div>
                             <button
                                 type="button"
                                 onClick={() => setProfileMenuOpen((value) => !value)}
@@ -238,7 +240,7 @@ export function DashboardPage({ user, refreshKey, onLogout, onLinkChanged }: Das
             </header>
 
             <div className="mx-auto max-w-5xl">
-                {showMaps ? <MapPresetsPage onBack={() => setShowMaps(false)} /> : showLobby ? <LobbyPage onBack={() => setShowLobby(false)} /> : showProfile && dashboardData ? (
+                {showFriends ? <FriendsPage onBack={() => setShowFriends(false)} /> : showMaps ? <MapPresetsPage onBack={() => setShowMaps(false)} /> : showLobby ? <LobbyPage onBack={() => setShowLobby(false)} /> : showProfile && dashboardData ? (
                     <ProfilePage user={user} data={dashboardData} onBack={() => setShowProfile(false)} />
                 ) : null}
                 <div className={showProfile ? "hidden" : ""}>
