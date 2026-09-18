@@ -9,7 +9,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { LobbyGamePage } from "./pages/LobbyGamePage";
-import { AdminPage } from "./pages/AdminPage";
+import { Sprint3PlaceholderPage } from "./pages/Sprint3PlaceholderPage";
 import { MainPage } from "./pages/MainPage";
 import type { Faction, LobbyPlayer } from "./types/dashboard";
 
@@ -290,17 +290,7 @@ function MainApp() {
         );
     } else if (showAdmin && user.is_admin) {
         screenKey = "admin";
-        screen = (
-            <AdminPage
-                onBack={goBack}
-                onLogout={() => {
-                    void apiRequest("/auth/logout", { method: "POST" });
-                    clearCache();
-                    setUser(null);
-                    setShowAdmin(false);
-                }}
-            />
-        );
+        screen = <Sprint3PlaceholderPage title="Admin tools" onBack={goBack} />;
     } else if (showProfile) {
         screenKey = "profile";
         screen = (
