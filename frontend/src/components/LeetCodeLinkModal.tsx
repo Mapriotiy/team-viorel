@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AlertCircle, Check, ExternalLink, Link2, RefreshCw, Unlink, X } from "lucide-react";
 import { apiRequest } from "../api/client";
+import { useToast } from "./toast/ToastProvider";
 
 const nowStore = { value: Date.now() };
 
@@ -65,6 +66,7 @@ function formatClock(totalSeconds: number): string {
 }
 
 export function LeetCodeLinkModal({ onClose, onChanged }: LeetCodeLinkModalProps) {
+    const { push } = useToast();
     const [status, setStatus] = useState<LinkStatus | null>(null);
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("");
@@ -172,6 +174,7 @@ export function LeetCodeLinkModal({ onClose, onChanged }: LeetCodeLinkModalProps
             );
             if (verification.status === "verified") {
                 setSuccess(true);
+                push("success", "LeetCode account linked");
                 onChanged();
             }
         } catch (e) {
@@ -188,6 +191,7 @@ export function LeetCodeLinkModal({ onClose, onChanged }: LeetCodeLinkModalProps
         try {
             await apiRequest("/leetcode/link", { method: "DELETE" });
             await refresh();
+            push("info", "LeetCode account unlinked");
             onChanged();
         } catch (e) {
             setError(e instanceof Error ? e.message : "Failed to unlink");

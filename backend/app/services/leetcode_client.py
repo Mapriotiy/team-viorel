@@ -14,6 +14,7 @@ from app.schemas.leetcode import (
     RecentAcceptedSubmission,
     SolvedStats,
 )
+from app.services.leetcode_limiter import register_rate_limit, release_slot, wait_for_slot
 
 
 logger = logging.getLogger(__name__)
@@ -97,7 +98,7 @@ query problemsetQuestionList($categorySlug: String, $skip: Int, $limit: Int, $fi
 _HEADERS = {
     "Content-Type": "application/json",
     "Referer": "https://leetcode.com",
-    "User-Agent": "vio-code-dev",
+    "User-Agent": "leetcode-streaks-dev",
 }
 
 _client: httpx.AsyncClient | None = None
@@ -308,20 +309,25 @@ class LeetCodeClient:
     async def _post_graphql(self, query: str, variables: dict) -> dict:
         client = await _get_client()
         try:
-            response = await client.post(
-                LEETCODE_GRAPHQL_URL,
-                json={
-                    "query": query,
-                    "variables": variables,
-                },
-                headers=_HEADERS,
-            )
+            await wait_for_slot()
+            try:
+                response = await client.post(
+                    LEETCODE_GRAPHQL_URL,
+                    json={
+                        "query": query,
+                        "variables": variables,
+                    },
+                    headers=_HEADERS,
+                )
+            finally:
+                release_slot()
         except httpx.HTTPError as exc:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Could not connect to LeetCode API",
             ) from exc
 
+        register_rate_limit(response.status_code)
         if response.status_code != status.HTTP_200_OK:
             logger.warning(
                 "LeetCode API returned %s for query %s",

@@ -1,4 +1,4 @@
-"""Tests for Google identity fields and LeetCode account verification."""
+"""Tests for Google identity fields, LeetCode account verification, and sync gating."""
 
 import asyncio
 import json
@@ -279,6 +279,28 @@ def test_unlink_releases_username_for_other_user(db):
     assert verification.status == "pending"
 
 
+# ── Sync gating ──
+
+
+def test_sync_skipped_for_unverified_user(db):
+    from app.services.leetcode_sync import is_leetcode_verified, maybe_sync_user_daily_activity
+
+    unverified = make_user(db, "bob")
+    assert is_leetcode_verified(unverified) is False
+
+    profile, submissions, meta = asyncio.run(maybe_sync_user_daily_activity(unverified, db))
+    assert meta["status"] == "skipped"
+    assert profile is None
+    assert submissions == []
+
+
+def test_sync_allowed_for_verified_user(db):
+    from app.services.leetcode_sync import is_leetcode_verified
+
+    verified = make_user(db, "alice", verified=True)
+    assert is_leetcode_verified(verified) is True
+
+
 # ── API level ──
 
 
@@ -501,3 +523,6 @@ def test_google_code_exchange_full_chain(tmp_path, monkeypatch):
     finally:
         app.dependency_overrides.clear()
         engine.dispose()
+
+
+

@@ -1,17 +1,67 @@
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Flame, Grid2x2, Map as MapIcon, Play, Trophy, Users, Zap } from "lucide-react";
 import { useGoogleLogin } from "./auth/useGoogleLogin";
 import { GoogleButton } from "./auth/GoogleButton";
+import { Footer } from "../components/Footer";
+import { Logo } from "../components/Logo";
+import { GeneratedMapRenderer } from "../features/lobby-map/GeneratedMapRenderer";
+import { DEFAULT_MAP_DRAFT } from "../features/lobby-map/defaultDraft";
+import { mapColors } from "../features/lobby-map/mapColors";
 
 type AuthPageProps = {
     initialError?: string | null;
     onClearError?: () => void;
 };
 
+const FACTION_COLORS = mapColors.landing.players;
+const ENEMY_COLOR = mapColors.landing.enemy;
+const FEATURE_ACCENTS = mapColors.landing.accents;
+
+const googleButtonClassName =
+    "!border-[#5a4235] !bg-[#211a16]/85 !text-[#f4e7d8] hover:!border-[#e6a15d]/60 hover:!bg-[#2a1f19]";
+
+function HeroMap() {
+    const [captured, setCaptured] = useState<Map<string, string>>(new Map());
+    const provinces = useMemo(() => DEFAULT_MAP_DRAFT.provinces.map((p) => p.provinceId), []);
+
+    useEffect(() => {
+        let index = 0;
+        const interval = window.setInterval(() => {
+            const id = provinces[index % provinces.length];
+            const isEnemy = Math.floor(index / 2) % 4 === 3;
+            const color = isEnemy
+                ? ENEMY_COLOR
+                : FACTION_COLORS[Math.floor(index / 2) % FACTION_COLORS.length];
+            setCaptured((prev) => {
+                const next = new Map(prev);
+                next.set(id, color);
+                return next;
+            });
+            index += 1;
+        }, 280);
+        return () => window.clearInterval(interval);
+    }, [provinces]);
+
+    return (
+        <div className="pointer-events-none select-none">
+            <GeneratedMapRenderer
+                draft={DEFAULT_MAP_DRAFT}
+                captured={captured}
+                zoomable={false}
+                interactive={false}
+                showMarkers={false}
+                showRoads={false}
+                showEffects={false}
+            />
+        </div>
+    );
+}
+
 const STEPS = [
     {
         icon: MapIcon,
         title: "Solve a problem",
-        body: "Open any province on the map and solve its LeetCode problem. Accepted submissions plant your flag.",
+        body: "Click a province to open its LeetCode problem. Accepted submissions plant your flag.",
     },
     {
         icon: Trophy,
@@ -37,58 +87,81 @@ export function AuthPage({ initialError = null, onClearError }: AuthPageProps) {
 
     return (
         <main
-            className="min-h-screen text-[#eff1f6]"
+            className="min-h-screen text-[#f4e7d8]"
             style={{
                 background:
-                    "linear-gradient(180deg, #1a1614 0%, #12100d 55%, #0f0d0b 100%)",
+                    "linear-gradient(180deg, #17110d 0%, #100c09 44%, #130f0c 100%)",
             }}
         >
-            <header className="sticky top-0 z-40 border-b border-[#2e2a26] bg-[#12100d]/90 backdrop-blur">
-                <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3.5">
-                    <span className="text-lg font-black tracking-tight text-[#e6a15d]">
-                        Vio<span className="text-[#eff1f6]">Code</span>
-                    </span>
-                    <GoogleButton
-                        onLogin={onLogin}
-                        isRedirecting={isRedirecting}
-                        className="!w-auto !px-4 !py-2"
-                    />
+            <header className="sticky top-0 z-40 border-b border-[#3f332d] bg-[#130f0c]/90 backdrop-blur">
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+                    <Logo className="text-[1.08rem]" />
+                    <div className="flex items-center gap-4">
+                        <a href="#how" className="hidden text-sm text-[#a8917d] transition hover:text-[#f4e7d8] sm:block">
+                            How it works
+                        </a>
+                        <a href="#features" className="hidden text-sm text-[#a8917d] transition hover:text-[#f4e7d8] sm:block">
+                            Features
+                        </a>
+                        <GoogleButton
+                            onLogin={onLogin}
+                            isRedirecting={isRedirecting}
+                            className={`!w-auto !px-4 !py-2 ${googleButtonClassName}`}
+                        />
+                    </div>
                 </div>
             </header>
 
-            <section className="mx-auto grid max-w-5xl items-center gap-10 px-6 py-20">
-                <div className="max-w-2xl">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-[#5a4235] bg-[#211a16] px-3 py-1 text-xs font-semibold text-[#e8b691]">
-                        Free — play with friends
+            <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:py-24">
+                <div className="relative">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-[#7a5136] bg-[#211a16] px-3 py-1 text-xs font-semibold text-[#e8b691]">
+                        Free - play with friends
                     </span>
                     <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight sm:text-6xl">
                         Solve LeetCode.
                         <br />
                         <span className="text-[#e6a15d]">Capture the map.</span>
                     </h1>
-                    <p className="mt-5 max-w-md text-base leading-relaxed text-[#9d8f80]">
+                    <p className="mt-5 max-w-md text-base leading-relaxed text-[#a8917d]">
                         Turn your daily grind into a live territory battle. Plant flags, steal provinces,
                         and keep a streak that never lets you quit.
                     </p>
-                    <div className="mt-8 max-w-sm">
+                    <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <GoogleButton
                             onLogin={onLogin}
                             isRedirecting={isRedirecting}
-                            className="!py-3.5"
+                            className={`sm:!w-auto sm:!px-8 sm:!py-3.5 ${googleButtonClassName}`}
                         />
-                        {errorMessage ? (
-                            <p className="mt-4 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-                                {errorMessage}
-                            </p>
-                        ) : null}
+                        <a
+                            href="#how"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#5a4235] bg-[#1b1512]/60 px-6 py-3.5 text-sm font-semibold text-[#f4e7d8] transition hover:border-[#e6a15d]/60 hover:bg-[#211a16]"
+                        >
+                            See how it works
+                        </a>
                     </div>
-                    <p className="mt-6 text-xs text-[#6b5f54]">
+                    {errorMessage ? (
+                        <p className="mt-4 max-w-sm rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                            {errorMessage}
+                        </p>
+                    ) : null}
+                    <p className="mt-6 text-xs text-[#7a6b5e]">
                         An independent project, not affiliated with LeetCode.
                     </p>
                 </div>
+
+                <div className="relative">
+                    <div className="overflow-hidden rounded-xl border border-[#3f332d] bg-[#211a16] shadow-2xl shadow-black/45">
+                        <HeroMap />
+                    </div>
+                    <div
+                        aria-hidden
+                        className="pointer-events-none absolute inset-0 rounded-xl"
+                        style={{ boxShadow: "inset 0 0 90px rgba(24, 12, 5, 0.72)" }}
+                    />
+                </div>
             </section>
 
-            <section id="how" className="mx-auto max-w-5xl px-6 py-16">
+            <section id="how" className="mx-auto max-w-6xl px-6 py-16">
                 <p className="text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#e6a15d]">
                     How it works
                 </p>
@@ -114,7 +187,7 @@ export function AuthPage({ initialError = null, onClearError }: AuthPageProps) {
                 </div>
             </section>
 
-            <section id="features" className="mx-auto max-w-5xl px-6 py-16">
+            <section id="features" className="mx-auto max-w-6xl px-6 py-16">
                 <p className="text-center text-xs font-semibold uppercase tracking-[0.3em] text-[#e6a15d]">
                     Features
                 </p>
@@ -122,24 +195,42 @@ export function AuthPage({ initialError = null, onClearError }: AuthPageProps) {
                     Built for the grind
                 </h2>
                 <div className="mt-10 grid gap-5 sm:grid-cols-2">
-                    {FEATURES.map((feature) => (
-                        <div
-                            key={feature.title}
-                            className="flex gap-4 rounded-xl border border-[#3f332d] bg-[#211a16] p-6 shadow-xl shadow-black/15 transition hover:border-[#e6a15d]/40"
-                        >
-                            <span className="mt-0.5 grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-[#7a5136] bg-[#2a1f19] text-[#e6a15d]">
-                                <feature.icon size={20} />
-                            </span>
-                            <div>
-                                <h3 className="font-semibold text-[#f4e7d8]">{feature.title}</h3>
-                                <p className="mt-1 text-sm leading-relaxed text-[#a8917d]">{feature.body}</p>
+                    {FEATURES.map((feature, index) => {
+                        const accent = FEATURE_ACCENTS[index % FEATURE_ACCENTS.length];
+                        return (
+                            <div
+                                key={feature.title}
+                                className="flex gap-4 rounded-xl border border-[#3f332d] bg-[#211a16] p-6 shadow-xl shadow-black/15 transition hover:border-[#e6a15d]/40"
+                            >
+                                <span
+                                    className="mt-0.5 grid h-11 w-11 shrink-0 place-items-center rounded-lg"
+                                    style={{
+                                        border: `1px solid ${accent}66`,
+                                        backgroundColor: `${accent}18`,
+                                        color: accent,
+                                    } as CSSProperties}
+                                >
+                                    <feature.icon size={20} />
+                                </span>
+                                <div>
+                                    <h3 className="font-semibold text-[#f4e7d8]">{feature.title}</h3>
+                                    <p className="mt-1 text-sm leading-relaxed text-[#a8917d]">{feature.body}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
 
-            <section className="mx-auto max-w-3xl px-6 py-20 text-center">
+            <section className="relative mx-auto max-w-3xl px-6 py-20 text-center">
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10"
+                    style={{
+                        background:
+                            "linear-gradient(180deg, transparent 0%, rgba(90, 66, 53, 0.12) 52%, transparent 100%)",
+                    }}
+                />
                 <h2 className="text-3xl font-bold tracking-tight text-[#f4e7d8] sm:text-4xl">
                     Ready to claim your first province?
                 </h2>
@@ -150,7 +241,7 @@ export function AuthPage({ initialError = null, onClearError }: AuthPageProps) {
                     <GoogleButton
                         onLogin={onLogin}
                         isRedirecting={isRedirecting}
-                        className="!py-3.5"
+                        className={`!py-3.5 ${googleButtonClassName}`}
                     />
                     {errorMessage ? (
                         <p className="mt-3 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
@@ -159,6 +250,8 @@ export function AuthPage({ initialError = null, onClearError }: AuthPageProps) {
                     ) : null}
                 </div>
             </section>
+
+            <Footer />
         </main>
     );
 }

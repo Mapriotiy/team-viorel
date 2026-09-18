@@ -25,7 +25,7 @@ def _normalize_sqlite_url(database_url: str) -> str:
 
 
 class Settings(BaseSettings):
-    database_url: str = f"{SQLITE_FILE_PREFIX}{(BACKEND_DIR / 'vio_code.local.db').as_posix()}"
+    database_url: str = f"{SQLITE_FILE_PREFIX}{(BACKEND_DIR / 'leetcode_streaks.local.db').as_posix()}"
     secret_key: str = "dev-secret-key"
     environment: str = "development"
     access_token_expire_minutes: int = 60 * 24
@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     # Where Google redirects after consent. Defaults to
     # "{frontend_url}/auth/callback"; set explicitly when the app is served
-    # under a sub-path (e.g. ".../team-viorel/auth/callback").
+    # under a sub-path (e.g. ".../cinnamon-code/auth/callback").
     google_redirect_uri: str = ""
 
     # LeetCode account verification.

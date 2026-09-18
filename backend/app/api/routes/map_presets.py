@@ -1,34 +1,73 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+"""User-owned, reusable generated-map presets. A preset stores a full
+GeneratedMapDraft so it can be applied to any lobby without regenerating."""
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from app.api.deps import get_current_user
+from app.api.routes.lobby import _validate_generated_draft
+from app.db.session import get_db
+from app.models.map_preset import MapPreset
+from app.models.user import User
+from app.schemas.map_preset import CreateMapPresetRequest, MapPresetResponse
 
 router = APIRouter()
 
-
-class MapPreset(BaseModel):
-    id: str
-    name: str
-    description: str
-    width: int
-    height: int
-    preview_url: str | None = None
+MAX_NAME_LENGTH = 80
 
 
-PRESETS = [
-    MapPreset(id="classic", name="Classic Valley", description="A balanced starter map for new teams.", width=8, height=8, preview_url=None),
-    MapPreset(id="coastline", name="Coastline", description="Open routes with a wide shoreline.", width=10, height=6, preview_url=None),
-    MapPreset(id="crossroads", name="Crossroads", description="Compact map with four strategic lanes.", width=7, height=7, preview_url=None),
-]
+def _to_response(preset: MapPreset) -> MapPresetResponse:
+    return MapPresetResponse(
+        id=preset.id,
+        name=preset.name,
+        draft=preset.map_config,
+        created_at=preset.created_at,
+    )
 
 
-@router.get("", response_model=list[MapPreset])
-def list_map_presets():
-    return PRESETS
+@router.get("/", response_model=list[MapPresetResponse])
+def list_map_presets(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    presets = (
+        db.query(MapPreset)
+        .filter(MapPreset.user_id == current_user.id)
+        .order_by(MapPreset.created_at.desc())
+        .all()
+    )
+    return [_to_response(preset) for preset in presets]
 
 
-@router.get("/{preset_id}", response_model=MapPreset)
-def get_map_preset(preset_id: str):
-    from fastapi import HTTPException
-    preset = next((item for item in PRESETS if item.id == preset_id), None)
-    if preset is None:
-        raise HTTPException(status_code=404, detail="Map preset not found")
-    return preset
+@router.post("/", response_model=MapPresetResponse, status_code=201)
+def create_map_preset(
+    payload: CreateMapPresetRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(400, "Preset name is required")
+    if len(name) > MAX_NAME_LENGTH:
+        raise HTTPException(400, "Preset name is too long")
+
+    draft = _validate_generated_draft(payload.draft)
+
+    preset = MapPreset(user_id=current_user.id, name=name, map_config=draft)
+    db.add(preset)
+    db.commit()
+    db.refresh(preset)
+    return _to_response(preset)
+
+
+@router.delete("/{preset_id}", status_code=204)
+def delete_map_preset(
+    preset_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    preset = db.get(MapPreset, preset_id)
+    if not preset or preset.user_id != current_user.id:
+        raise HTTPException(404, "Preset not found")
+    db.delete(preset)
+    db.commit()

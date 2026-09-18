@@ -14,7 +14,7 @@ export function Logo({
     return (
         <span
             className={`inline-flex items-center gap-[0.58em] leading-none ${className}`}
-            aria-label="Vio Code"
+            aria-label="Cinnamon Code"
         >
             <img
                 src={`${import.meta.env.BASE_URL}logo.svg`}
@@ -25,7 +25,7 @@ export function Logo({
                 <span
                     className={`brand-wordmark whitespace-nowrap text-[1em] font-bold text-[#f2eee9] ${textClassName}`}
                 >
-                    vio<span className="text-[#e6a15d]">.</span>code
+                    cinnamon<span className="text-[#df6a24]">.</span>code
                 </span>
             ) : null}
         </span>

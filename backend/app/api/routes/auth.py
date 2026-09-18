@@ -27,6 +27,8 @@ from app.services.google_oauth import (
     oauth_session_expires_at,
     verify_google_code,
 )
+from app.services.activity_tracking import record_user_activity
+from app.services.rate_limit import enforce_rate_limit
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -39,6 +41,7 @@ def _utcnow() -> datetime:
 @router.get("/google/login-url", response_model=GoogleLoginUrlResponse)
 def google_login_url(request: Request, db: Session = Depends(get_db)):
     """Start Google OAuth: create a server-side session and return the consent URL."""
+    enforce_rate_limit(request, "oauth-start", 10, 600)
     if not settings.google_client_id or not settings.google_client_secret:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -70,6 +73,7 @@ def google_login_url(request: Request, db: Session = Depends(get_db)):
 @router.post("/google/code", response_model=TokenResponse)
 async def google_code(request: Request, response: Response, payload: GoogleCodeRequest, db: Session = Depends(get_db)):
     """Exchange the Google authorization code for our own JWT."""
+    enforce_rate_limit(request, "oauth-code", 10, 600)
     session = db.query(OAuthSession).filter_by(state=payload.state).first()
     if session is None:
         raise HTTPException(
@@ -157,6 +161,7 @@ async def google_code(request: Request, response: Response, payload: GoogleCodeR
 
 @router.get("/me", response_model=MeResponse)
 def get_me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    record_user_activity(current_user.id, db)
     return MeResponse(
         id=current_user.id,
         google_sub=current_user.google_sub,
