@@ -148,10 +148,11 @@ function MainApp() {
             if (code && state && !processedOAuthStates.has(state)) {
                 processedOAuthStates.add(state);
                 try {
-                    await apiRequest<{ access_token: string }>("/auth/google/code", {
+                    const tokenResponse = await apiRequest<{ access_token: string }>("/auth/google/code", {
                         method: "POST",
                         body: JSON.stringify({ code, state }),
                     });
+                    sessionStorage.setItem("vio_access_token", tokenResponse.access_token);
                     clearUrlParam("code");
                     clearUrlParam("state");
                     setAuthError(null);

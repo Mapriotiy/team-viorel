@@ -10,6 +10,7 @@ export async function apiRequest<T>(
         .find((part) => part.startsWith("csrf_token="))
         ?.slice("csrf_token=".length);
     const method = (options.method ?? "GET").toUpperCase();
+    const accessToken = sessionStorage.getItem("vio_access_token");
 
     const response = await fetch(`${API_URL}${path}`, {
         ...options,
@@ -17,6 +18,7 @@ export async function apiRequest<T>(
         headers: {
             "Content-Type": "application/json",
             ...(csrf && method !== "GET" && method !== "HEAD" ? { "X-CSRF-Token": csrf } : {}),
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             ...options.headers,
         },
     });
