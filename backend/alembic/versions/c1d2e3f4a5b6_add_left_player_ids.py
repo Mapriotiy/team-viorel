@@ -20,8 +20,11 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # Fail fast if the table is locked by a long-running session (e.g. an open
     # SSE connection) instead of hanging the deploy with "no open ports".
-    op.execute("SET lock_timeout = 30000")
-    op.add_column("lobbies", sa.Column("left_player_ids", sa.JSON(), nullable=True))
+    if op.get_bind().dialect.name == "postgresql":
+        op.execute("SET lock_timeout = 30000")
+    columns = {column["name"] for column in sa.inspect(op.get_bind()).get_columns("lobbies")}
+    if "left_player_ids" not in columns:
+        op.add_column("lobbies", sa.Column("left_player_ids", sa.JSON(), nullable=True))
 
 
 def downgrade() -> None:

@@ -18,12 +18,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    with op.batch_alter_table("lobby_map_provinces") as batch_op:
-        batch_op.add_column(sa.Column("fortified_until", sa.DateTime(), nullable=True))
-
-    with op.batch_alter_table("lobby_players") as batch_op:
-        batch_op.add_column(sa.Column("powerups", sa.JSON(), nullable=True))
-        batch_op.add_column(sa.Column("granted_regions", sa.JSON(), nullable=True))
+    inspector = sa.inspect(op.get_bind())
+    province_columns = {column["name"] for column in inspector.get_columns("lobby_map_provinces")}
+    player_columns = {column["name"] for column in inspector.get_columns("lobby_players")}
+    if "fortified_until" not in province_columns:
+        op.add_column("lobby_map_provinces", sa.Column("fortified_until", sa.DateTime(), nullable=True))
+    if "powerups" not in player_columns:
+        op.add_column("lobby_players", sa.Column("powerups", sa.JSON(), nullable=True))
+    if "granted_regions" not in player_columns:
+        op.add_column("lobby_players", sa.Column("granted_regions", sa.JSON(), nullable=True))
 
 
 def downgrade() -> None:
