@@ -182,5 +182,7 @@ def stream_token(current_user: User = Depends(get_current_user)):
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(response: Response):
-    response.delete_cookie(ACCESS_COOKIE_NAME, path="/")
-    response.delete_cookie(CSRF_COOKIE_NAME, path="/")
+    secure = settings.environment.lower() in {"production", "prod"} or settings.database_url.startswith("postgresql")
+    same_site = "none" if secure else "lax"
+    response.delete_cookie(ACCESS_COOKIE_NAME, path="/", secure=secure, httponly=True, samesite=same_site)
+    response.delete_cookie(CSRF_COOKIE_NAME, path="/", secure=secure, httponly=False, samesite=same_site)

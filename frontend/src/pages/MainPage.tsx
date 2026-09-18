@@ -745,7 +745,7 @@ export function MainPage() {
     }, []);
 
     const handleLogout = useCallback(() => {
-        void apiRequest("/auth/logout", { method: "POST" });
+        void apiRequest("/auth/logout", { method: "POST" }).catch(() => undefined);
         sessionStorage.removeItem("vio_access_token");
         clearCache();
         localStorage.removeItem("pendingInviteToken");
