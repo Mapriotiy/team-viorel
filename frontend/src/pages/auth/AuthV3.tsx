@@ -81,7 +81,7 @@ export function AuthV3({ errorMessage, isRedirecting, onLogin }: AuthFormProps) 
 
                     <div className="relative z-10 w-full max-w-sm rounded-3xl border border-white/10 bg-[#141519]/70 p-7 shadow-2xl shadow-black/50 backdrop-blur-md">
                         <h2 className="text-2xl font-semibold tracking-tight">
-                            Welcome to Cinnamon Code
+                            Welcome to Vio Code
                         </h2>
                         <p className="mt-2 text-sm text-[#b3b3b3]">
                             Sign in to continue your conquest.

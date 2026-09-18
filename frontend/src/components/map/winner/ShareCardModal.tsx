@@ -61,7 +61,7 @@ export function ShareCardModal({ data, replayUrl, onClose }: ShareCardModalProps
                 <div className="flex flex-col gap-2 p-4">
                     <a
                         href={cardUrl ?? undefined}
-                        download="cinnamon-code-share.png"
+                        download="vio-code-share.png"
                         className="inline-flex items-center justify-center gap-2 rounded-md bg-[#c86f3c] px-4 py-2.5 text-sm font-semibold text-[#111] transition hover:bg-[#d9823f] disabled:opacity-50"
                     >
                         <Download size={16} />

@@ -132,7 +132,7 @@ export function WinV4({
                     <ShareCardModal
                         data={{
                             title,
-                            name: winnerLabel ?? "Cinnamon Code",
+                            name: winnerLabel ?? "Vio Code",
                             accentColor,
                             points: stats?.points ?? 0,
                             provinces: stats?.provinces ?? 0,
