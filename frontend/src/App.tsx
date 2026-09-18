@@ -30,6 +30,15 @@ const KEEP_ALIVE_INTERVAL_MS = 10 * 60 * 1000;
 // Guards against the OAuth callback being processed twice (StrictMode remounts).
 const processedOAuthStates = new Set<string>();
 
+async function cacheBearerToken() {
+    try {
+        const token = await apiRequest<{ access_token: string }>("/auth/stream-token");
+        sessionStorage.setItem("vio_access_token", token.access_token);
+    } catch {
+        // Cookie-authenticated local development may not expose stream tokens.
+    }
+}
+
 export default function App() {
     return (
         <ToastProvider>
@@ -157,6 +166,7 @@ function MainApp() {
                     clearUrlParam("state");
                     setAuthError(null);
                     const me = await apiRequest<User>("/auth/me");
+                    await cacheBearerToken();
                     setUser(me);
                     const pendingInviteToken = localStorage.getItem("pendingInviteToken");
                     if (pendingInviteToken) setInviteToken(pendingInviteToken);
@@ -173,6 +183,7 @@ function MainApp() {
 
             try {
                 const me = await apiRequest<User>("/auth/me");
+                await cacheBearerToken();
                 setUser(me);
             } catch {
             void apiRequest("/auth/logout", { method: "POST" });
