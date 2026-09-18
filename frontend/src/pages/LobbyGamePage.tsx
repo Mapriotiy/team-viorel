@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/client';
-import { BingoBoardPage } from './BingoBoardPage';
 import { LobbyMapPage } from './LobbyMapPage';
 
 type LobbyPlayer = {
@@ -46,8 +45,5 @@ export function LobbyGamePage(props: LobbyGamePageProps) {
         );
     }
 
-    if (gameMode === 'bingo') {
-        return <BingoBoardPage {...props} />;
-    }
     return <LobbyMapPage {...props} />;
 }

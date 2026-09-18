@@ -24,9 +24,8 @@ import { API_URL, apiRequest } from "../api/client";
 import { LobbyPage } from "./LobbyPage";
 import { LobbyGamePage } from "./LobbyGamePage";
 import { ProfilePage } from "./ProfilePage";
-import { AdminPage } from "./AdminPage";
 import { FriendsPage } from "./FriendsPage";
-import { QuestsPage } from "./QuestsPage";
+import { Sprint3PlaceholderPage } from "./Sprint3PlaceholderPage";
 import { NotificationBell } from "../components/NotificationBell";
 import { LeetCodeLinkModal } from "../components/LeetCodeLinkModal";
 import { LanguageIcon } from "../components/LanguageIcon";
@@ -820,11 +819,11 @@ export function MainPage() {
     if (screen === "profile") {
         content = <ProfilePage onBack={goDashboard} onLogout={handleLogout} />;
     } else if (screen === "admin") {
-        content = <AdminPage onBack={goDashboard} onLogout={handleLogout} />;
+        content = <Sprint3PlaceholderPage title="Admin tools" onBack={goDashboard} />;
     } else if (screen === "friends") {
         content = <FriendsPage currentUserId={user.id} onBack={goDashboard} />;
     } else if (screen === "quests") {
-        content = <QuestsPage onBack={goDashboard} />;
+        content = <Sprint3PlaceholderPage title="Quests" onBack={goDashboard} />;
     } else if (screen === "friendProfile" && selectedFriend) {
         content = (
             <main className="page-enter min-h-[100dvh] bg-[#14110f] pb-[env(safe-area-inset-bottom)] text-[#f4e7d8]">
