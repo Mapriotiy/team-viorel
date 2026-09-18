@@ -21,6 +21,7 @@ import {
 import { Logo } from "../components/Logo";
 import { Footer } from "../components/Footer";
 import { API_URL, apiRequest } from "../api/client";
+import { clearCache } from "../api/localCache";
 import { LobbyPage } from "./LobbyPage";
 import { LobbyGamePage } from "./LobbyGamePage";
 import { ProfilePage } from "./ProfilePage";
@@ -745,6 +746,10 @@ export function MainPage() {
 
     const handleLogout = useCallback(() => {
         void apiRequest("/auth/logout", { method: "POST" });
+        sessionStorage.removeItem("vio_access_token");
+        clearCache();
+        localStorage.removeItem("pendingInviteToken");
+        localStorage.removeItem("pendingLobbyInviteToken");
         setUser(null);
         setDashboardData(null);
         setScreen("dashboard");
@@ -775,8 +780,24 @@ export function MainPage() {
 
     const copyInvite = useCallback(async () => {
         if (!inviteUrl) return;
-        await navigator.clipboard.writeText(inviteUrl);
-        setCopyMessage("Copied");
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(inviteUrl);
+            } else {
+                const input = document.createElement("textarea");
+                input.value = inviteUrl;
+                input.style.position = "fixed";
+                input.style.opacity = "0";
+                document.body.appendChild(input);
+                input.focus();
+                input.select();
+                if (!document.execCommand("copy")) throw new Error("copy failed");
+                input.remove();
+            }
+            setCopyMessage("Copied");
+        } catch {
+            setCopyMessage("Select and copy the link");
+        }
         window.setTimeout(() => setCopyMessage(null), 2000);
     }, [inviteUrl]);
 
