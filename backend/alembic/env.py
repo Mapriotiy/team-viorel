@@ -22,12 +22,23 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from app.db.base import Base
 from app.models.user import User
-from app.models.oauth_session import OAuthSession
-from app.models.leetcode_problem import LeetCodeProblem
-from app.models.leetcode_account_verification import LeetCodeAccountVerification
 from app.models.daily_activity import DailyActivity
-from app.models.user_activity import UserActivity
-from app.models.lobby import Lobby, LobbyPlayer
+from app.models.friend_invite import FriendInvite
+from app.models.friendship import Friendship
+from app.models.leetcode_problem import LeetCodeProblem
+from app.models.user_solved import UserSolved
+from app.models.weekly_map import WeeklyMap
+from app.models.weekly_map_province import WeeklyMapProvince
+from app.models.map_event import MapEvent
+from app.models.lobby import Lobby
+from app.models.lobby_player import LobbyPlayer
+from app.models.lobby_invite import LobbyInvite
+from app.models.lobby_map import LobbyMap
+from app.models.lobby_map_province import LobbyMapProvince
+from app.models.lobby_event import LobbyEvent
+from app.models.lobby_board_cell import LobbyBoardCell
+from app.models.leetcode_sync_state import LeetCodeSyncState
+from app.models.map_preset import MapPreset
 
 target_metadata = Base.metadata
 
