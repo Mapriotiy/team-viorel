@@ -137,7 +137,6 @@ export function DashboardPage({ user, refreshKey, onLogout, onOpenLobby, onLinkC
             void loadDashboard();
         }, 2500);
         return () => window.clearTimeout(refreshId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadDashboard, refreshKey]);
 
     const handleLinkChanged = useCallback(() => {

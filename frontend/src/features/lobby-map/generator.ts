@@ -565,7 +565,10 @@ function createSeaSprites(islands: readonly LayoutPiece[], scale: GeneratedMapSi
         }
     }
 
-    return sprites.map(({ height: _height, ...sprite }) => sprite);
+    return sprites.map(({ height, ...sprite }) => {
+        void height;
+        return sprite;
+    });
 }
 
 function getAttr(tag: string, name: string) {

@@ -336,7 +336,7 @@ export function LobbyMapPage({ lobbyId, currentUserId, players, factions, isAdmi
         }
     }, [lobbyId, applyMapData]);
 
-    const usePowerup = useCallback(async (kind: string, provinceId: string) => {
+    const activatePowerup = useCallback(async (kind: string, provinceId: string) => {
         setPowerupError(null);
         try {
             const data = await apiRequest<MapApiResponse>(
@@ -457,12 +457,12 @@ export function LobbyMapPage({ lobbyId, currentUserId, players, factions, isAdmi
             }
             const kind = armedPowerup;
             setArmedPowerup(null);
-            void usePowerup(kind, id).catch(() => {});
+            void activatePowerup(kind, id).catch(() => {});
             return;
         }
         setSelectedProvince(id);
         setPopPos(pos);
-    }, [armedPowerup, displayedProvincesData, factionByPlayer, currentUserId, usePowerup]);
+    }, [armedPowerup, displayedProvincesData, factionByPlayer, currentUserId, activatePowerup]);
 
     const handleClose = useCallback(() => {
         setSelectedProvince(null);

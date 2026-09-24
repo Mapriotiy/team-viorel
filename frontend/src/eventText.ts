@@ -5,7 +5,8 @@ export function provinceName(provinceId: string | null): string {
     return provinceId;
 }
 
-export function regionNameForProvince(_provinceId: string | null): string {
+export function regionNameForProvince(provinceId: string | null): string {
+    void provinceId;
     return 'a region';
 }
 

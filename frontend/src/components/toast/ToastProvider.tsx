@@ -14,7 +14,6 @@ type ToastApi = {
 
 const ToastContext = createContext<ToastApi>({ push: () => {} });
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useToast() {
     return useContext(ToastContext);
 }

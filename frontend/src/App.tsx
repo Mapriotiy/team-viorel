@@ -7,9 +7,11 @@ import { Background } from "./components/Background";
 import { ToastProvider } from "./components/toast/ToastProvider";
 import { AuthPage } from "./pages/AuthPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { ReplayPage } from "./pages/ReplayPage";
 import { LobbyPage } from "./pages/LobbyPage";
 import { LobbyGamePage } from "./pages/LobbyGamePage";
-import { Sprint3PlaceholderPage } from "./pages/Sprint3PlaceholderPage";
+import { AdminPage } from "./pages/AdminPage";
+import { MapTestPage } from "./pages/MapTestPage";
 import { MainPage } from "./pages/MainPage";
 import type { Faction, LobbyPlayer } from "./types/dashboard";
 
@@ -40,10 +42,19 @@ async function cacheBearerToken() {
 }
 
 export default function App() {
+    const params = new URLSearchParams(window.location.search);
+    const isMapTest = params.get("mapTest") === "1";
+    const replayParam = params.get("replay");
     return (
         <ToastProvider>
             <Background />
-            <MainApp />
+            {isMapTest ? (
+                <MapTestPage />
+            ) : replayParam ? (
+                <ReplayPage replayToken={replayParam} />
+            ) : (
+                <MainApp />
+            )}
         </ToastProvider>
     );
 }
@@ -241,7 +252,9 @@ function MainApp() {
         try {
             const data = await apiRequest<{ lobby: { id: number }; invite_url: string }>(`/lobbies/${lobbyId}`);
             finalLobbyId = data.lobby?.id ?? lobbyId;
-        } catch {}
+        } catch {
+            // The lobby may already be closed; navigation can still use the known id.
+        }
         pushNav({ screen: "lobby", lobbyId: finalLobbyId });
     };
 
@@ -302,7 +315,18 @@ function MainApp() {
         );
     } else if (showAdmin && user.is_admin) {
         screenKey = "admin";
-        screen = <Sprint3PlaceholderPage title="Admin tools" onBack={goBack} />;
+        screen = (
+            <AdminPage
+                onBack={goBack}
+                onLogout={() => {
+                    void apiRequest("/auth/logout", { method: "POST" });
+                    sessionStorage.removeItem("vio_access_token");
+                    clearCache();
+                    setUser(null);
+                    setShowAdmin(false);
+                }}
+            />
+        );
     } else if (showProfile) {
         screenKey = "profile";
         screen = (

@@ -55,7 +55,7 @@ export function WinnerOverlay({
                     durationMs={WINNER_CUTSCENE_MS}
                 />
             ) : null,
-        [hasMap, draft, provinces, accentColor, phase],
+        [hasMap, draft, provinces, accentColor, capturedColors, phase],
     );
 
     if (phase === "conquest" && hasMap) {

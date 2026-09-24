@@ -23,7 +23,9 @@ export function readLobbyMapSelection(lobbyId: number): LobbyMapSelection {
         if (!raw) return { kind: "generated", draft: DEFAULT_MAP_DRAFT };
         const parsed = JSON.parse(raw) as LobbyMapSelection;
         if (parsed?.kind === "generated" && isGeneratedMapDraft(parsed.draft)) return parsed;
-    } catch {}
+    } catch {
+        // Invalid local state falls back to the bundled default map.
+    }
     return { kind: "generated", draft: DEFAULT_MAP_DRAFT };
 }
 
