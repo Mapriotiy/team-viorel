@@ -557,12 +557,19 @@ async def start_game(lobby_id: int, current_user: User = Depends(get_current_use
             503,
             f"Problem catalog has {catalog_problem_count(db)} problems; preload it before starting a game",
         )
-    await get_mode(lobby.game_mode).start(lobby, players, db)
-
-    lobby.status = "active"
-    lobby.started_at = utcnow()
-    db.commit()
-    db.refresh(lobby)
+    try:
+        await get_mode(lobby.game_mode).start(lobby, players, db)
+        lobby.status = "active"
+        lobby.started_at = utcnow()
+        db.commit()
+        db.refresh(lobby)
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Failed to start lobby %s in mode %s", lobby_id, lobby.game_mode)
+        raise HTTPException(500, "Unable to initialize the game") from exc
     invite = db.query(LobbyInvite).filter_by(lobby_id=lobby.id).first()
     return _to_lobby_response(lobby, db, _invite_url(invite.token) if invite else None)
 
